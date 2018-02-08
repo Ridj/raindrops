@@ -1,4 +1,4 @@
-#! Raindrops only file.
+#! Raindrops falling down with the village house screen program.
 
 import pygame
 import sys
@@ -7,6 +7,7 @@ from pygame.sprite import Group, Sprite
 
 
 class Background(Sprite):
+    """Class for background picture"""
     def __init__(self, rd_set, screen):
         Sprite.__init__(self)
         self.rd_set = rd_set
@@ -16,11 +17,11 @@ class Background(Sprite):
         self.rect.left, self.rect.top = 0, 0
 
     def blitme(self):
-        """Прорисовывает пришеля и его текущее положение"""
         self.screen.blit(self.image, self.rect)
 
 
 class Settings:
+    """Class for settings of program"""
     def __init__(self):
         self.screen_width = 600
         self.screen_height = 490
@@ -31,6 +32,7 @@ class Settings:
 
 
 class Raindrop(Sprite):
+    """Class for raindrops falling down"""
     def __init__(self, rd_set, screen):
         super(Raindrop, self).__init__()
         self.screen = screen
@@ -52,64 +54,64 @@ class Raindrop(Sprite):
         self.screen.blit(self.image, self.rect)
 
 
-def check_events(rd_set, screen, raindrops):
+def check_events():
+    """Checking exit conditions"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
 
-def check_keydown_events(event, rd_set, screen, raindrops):
-    if event.key == pygame.K_q:
-        sys.exit()
-
-
-def fire_bullet(rd_set, screen, raindrops):
-    if len(raindrops) < rd_set.raindrop_allowed:
+def rainy_day(rd_set, screen, drops):
+    """Create the rain, a lot of raindrops"""
+    if len(drops) < rd_set.raindrop_allowed:
         new_drop = Raindrop(rd_set, screen)
         new_drop.x = randint(0, 600)
         new_drop.rect.x = new_drop.x
         new_drop.rect.y = 0
-        raindrops.add(new_drop)
+        drops.add(new_drop)
 
 
-def update_screen(rd_set, screen, raindrops, Background):
+def update_screen(rd_set, screen, drops, background):
+    """Updates screen"""
     screen.fill(rd_set.bg_color)
-    screen.blit(Background.image, Background.rect)
-    Background.blitme()
-    raindrops.draw(screen)
+    screen.blit(background.image, background.rect)
+    background.blitme()
+    drops.draw(screen)
     pygame.display.flip()
 
 
-def update_raindrops(rd_set, raindrops):
-    raindrops.update()
-    for drop in raindrops.copy():
+def update_raindrops(drops):
+    """Update raindrops and remove them if they reach the bottom"""
+    drops.update()
+    for drop in drops.copy():
         if drop.rect.bottom >= 490:
-            drop.remove(raindrops)
+            drop.remove(drops)
 
 
-def create_drops(rd_set, screen, raindrops):
-    drop = Raindrop(rd_set, screen)
-    for alien_number in range(3):
+def create_drops(rd_set, screen, drops):
+    """Creates declared number of raindrops"""
+    for drop_number in range(3):
         if randint(0, 20) == 3:
-            fire_bullet(rd_set, screen, raindrops)
+            rainy_day(rd_set, screen, drops)
 
 
 def raindrops():
+    """Start the rain!"""
     pygame.init()
     rd_set = Settings()
     screen = pygame.display.set_mode((rd_set.screen_width,
                                       rd_set.screen_height))
     pygame.display.set_caption("Raindrops")
-    BackGround = Background(rd_set, screen)
-    BackGround.x = 0
-    BackGround.y = 0
-    BackGround.blitme()
-    raindrops = Group()
+    background = Background(rd_set, screen)
+    background.x = 0
+    background.y = 0
+    background.blitme()
+    drops = Group()
     while True:
-        check_events(rd_set, screen, raindrops)
-        create_drops(rd_set, screen, raindrops)
-        update_raindrops(rd_set, raindrops)
-        update_screen(rd_set, screen, raindrops, BackGround)
+        check_events()
+        create_drops(rd_set, screen, drops)
+        update_raindrops(drops)
+        update_screen(rd_set, screen, drops, background)
 
 
 raindrops()
